@@ -53,14 +53,14 @@ def get_positive_float(prompt, default=0.0, max_val=None):
         try:
             val = float(raw)
             if val < 0:
-                print("  ⚠ Please enter a value of 0 or more.")
+                print(" Please enter a value of 0 or more.")
                 continue
             if max_val is not None and val > max_val:
-                print(f"  ⚠ Maximum allowed is {format_inr(max_val)}. Capping to that.")
+                print(f" Maximum allowed is {format_inr(max_val)}. Cannot go beyond this value.")
                 return float(max_val)
             return val
         except ValueError:
-            print("  ⚠ Invalid input. Please enter a number (e.g. 500000).")
+            print(" Invalid input. Please enter a number (e.g. 500000).")
 
 
 def get_yes_no(prompt, default="y"):
@@ -77,7 +77,7 @@ def get_yes_no(prompt, default="y"):
             return True
         if raw in ("n", "no"):
             return False
-        print("  ⚠ Please type Y or N.")
+        print("   Please type Y or N.")
 
 
 def get_choice(prompt, choices):
@@ -93,9 +93,9 @@ def get_choice(prompt, choices):
             idx = int(raw) - 1
             if 0 <= idx < len(choices):
                 return choices[idx]
-            print(f"  ⚠ Please enter a number between 1 and {len(choices)}.")
+            print(f" Please enter a number between 1 and {len(choices)}.")
         except ValueError:
-            print("  ⚠ Please enter a number.")
+            print(" Please enter a number.")
 
 
 def print_section(title):
@@ -128,9 +128,9 @@ def collect_personal_details():
     print_section("PERSONAL DETAILS")
     print("""
   Age determines your basic exemption limit in the Old Regime:
-    Below 60 (General)      → Exempt up to ₹2,50,000
-    60–79  (Senior Citizen) → Exempt up to ₹3,00,000
-    80+    (Super Senior)   → Exempt up to ₹5,00,000
+    Below 60 (General Citizens)      → Exempt up to ₹2,50,000
+    60–79  (Senior Citizens) → Exempt up to ₹3,00,000
+    80+    (Super Seniors)   → Exempt up to ₹5,00,000
     """)
 
     print("  Select your age category:")
@@ -215,7 +215,7 @@ def collect_old_regime_deductions(income, age_category):
     std_ded = 50000
     deductions["standard_deduction"] = std_ded
     ded_labels["standard_deduction"] = "Standard Deduction (auto)"
-    print(f"  ✓ Standard Deduction of {format_inr(std_ded)} applied automatically for salaried employees.")
+    print(f" Standard Deduction of {format_inr(std_ded)} applied automatically for salaried employees.")
 
     # ── HRA Exemption ─────────────────────────────────────
     # HRA received from employer is NOT fully taxable.
@@ -232,18 +232,16 @@ def collect_old_regime_deductions(income, age_category):
   Metro cities: Delhi, Mumbai, Kolkata, Chennai
     """)
 
-    if income["hra_recv"] > 0 and get_yes_no("  Do you pay rent and want to claim HRA exemption?"):
-        rent_paid = get_positive_float("  Rent paid per year (₹)")
+    if income["hra_recv"] > 0 and get_yes_no(" Do you pay rent and want to claim HRA exemption?"):
+        rent_paid = get_positive_float(" Rent paid per year (₹)")
         print("  Is your city a metro (Delhi/Mumbai/Kolkata/Chennai)?")
         is_metro = get_yes_no("  Metro city?")
-
         basic_da = income["basic"]
         city_pct = 0.50 if is_metro else 0.40
         hra_a = income["hra_recv"]
         hra_b = city_pct * basic_da
         hra_c = max(0, rent_paid - 0.10 * basic_da)
         hra_exempt = min(hra_a, hra_b, hra_c)
-
         print(f"""
   HRA Exemption Calculation:
     (a) Actual HRA received          = {format_inr(hra_a)}
